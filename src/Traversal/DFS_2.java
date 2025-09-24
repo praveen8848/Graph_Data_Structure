@@ -12,7 +12,7 @@ public class DFS_2 {
         g.addEdge(1, 4);
         g.addEdge(2, 5);
         boolean[] visited = new boolean[6];
-        System.out.println("Traversal ");
+        System.out.println("Traversal: ");
         g.D_F_S_Traversal(0,visited);
     }
 }
