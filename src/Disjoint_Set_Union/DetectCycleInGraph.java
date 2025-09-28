@@ -1,38 +1,47 @@
 package Disjoint_Set_Union;
 
-class OptimizedDSU {
-    int[] parent;
-    int[] rank;
+// Disjoint Set Union (Union-Find) Data Structure
+class DisjointSet {
+    private int[] parent; // Stores parent (leader) of each node
+    private int[] rank;   // Stores rank (approximate tree height)
 
-    public OptimizedDSU(int n){
+    // Constructor: initialize DSU with n elements
+    public DisjointSet(int n) {
         parent = new int[n];
         rank = new int[n];
-        for(int i = 0; i<n; i++){
-            parent[i] = i;
+        for (int i = 0; i < n; i++) {
+            parent[i] = i;   // Each node is its own parent initially
+            rank[i] = 0;     // Rank starts from 0
         }
     }
 
-    public int find(int x){
-        if(parent[x] != x){
+    // Find with Path Compression
+    public int find(int x) {
+        if (parent[x] != x) {
+            // Recursively find parent and compress the path
             parent[x] = find(parent[x]);
         }
         return parent[x];
     }
+
+    // Union by Rank
+    // Returns false if x and y are already in the same set (cycle detected)
     public boolean union(int x, int y) {
         int rootX = find(x);
         int rootY = find(y);
 
+        // If both nodes have the same root -> cycle
         if (rootX == rootY) {
-            // If already in the same set, then cycle detected
             return false;
         }
 
         // Attach smaller rank tree under larger rank tree
         if (rank[rootX] < rank[rootY]) {
-            parent[rootX] = rootY;
+            parent[rootX] = rootY; // rootX becomes child of rootY
         } else if (rank[rootX] > rank[rootY]) {
-            parent[rootY] = rootX;
+            parent[rootY] = rootX; // rootY becomes child of rootX
         } else {
+            // If both ranks are equal, choose one root and increase its rank
             parent[rootY] = rootX;
             rank[rootX]++;
         }
@@ -40,20 +49,23 @@ class OptimizedDSU {
         return true;
     }
 }
-public class DetectCycleInGraph {
-    public static boolean hasCycle(int n, int[][] edges) {
-        OptimizedDSU dsu = new OptimizedDSU(n);
 
+public class DetectCycleInGraph {
+    // Function to check if an undirected graph contains a cycle
+    public static boolean hasCycle(int n, int[][] edges) {
+        DisjointSet dsu = new DisjointSet(n);
+
+        // Process each edge
         for (int[] edge : edges) {
             int u = edge[0];
             int v = edge[1];
 
-            // If union fails, means cycle detected
+            // If union returns false => u and v already connected => cycle exists
             if (!dsu.union(u, v)) {
                 return true;
             }
         }
-        return false;
+        return false; // No cycle found
     }
 
     public static void main(String[] args) {
@@ -62,10 +74,11 @@ public class DetectCycleInGraph {
                 {0, 1},
                 {1, 2},
                 {3, 4},
-                {2, 4}, // Adding this connects all nodes
-                {4, 0}  // This creates a cycle
+                {2, 4}, // connecting components
+                {4, 0}  // creates cycle
         };
 
+        // Call function and print result
         if (hasCycle(n, edges)) {
             System.out.println("Graph contains a cycle.");
         } else {
@@ -73,4 +86,3 @@ public class DetectCycleInGraph {
         }
     }
 }
-
