@@ -1,0 +1,71 @@
+Solved First Dijkstra's Algorithm Problem on Leetcode:
+Problem Number: 743
+Problem Name: Network Delay Time
+Problem Link: https://leetcode.com/problems/network-delay-time/description/
+
+Problem Description:
+You are given a network of n nodes, labeled from 1 to n. You are also given times, a list of travel times as directed edges times[i] = (ui, vi, wi), where ui is the source node, vi is the target node,
+and wi is the time it takes for a signal to travel from source to target.
+We will send a signal from a given node k. Return the minimum time it takes for all the n nodes to receive the signal. If it is impossible for all the n nodes to receive the signal, return -1.
+
+```
+My Solution: 
+
+class Solution {
+    public int networkDelayTime(int[][] times, int n, int k) {
+        List<List<Pair>>  adj = new ArrayList<>();
+        for(int i = 0; i<=n; i++){
+            adj.add(new ArrayList<>());
+        }
+        for(int[] a : times){
+            adj.get(a[0]).add(new Pair(a[1], a[2]));
+        }
+        int ans = Dijkstra(k, adj, n);
+         return ans;
+    }
+    public int Dijkstra(int source, List<List<Pair>>  adj, int n){
+        int[] dist = new int[n+1];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[source] = 0;
+
+        PriorityQueue<Pair> pq = new PriorityQueue<>(
+            (a, b) -> a.w - b.w
+        );
+        pq.add(new Pair(source, 0));
+
+        while(!pq.isEmpty()){
+            Pair p = pq.poll();
+            int u = p.n;
+            int d = p.w;
+
+            if(d>dist[u]){
+                continue;
+            }
+
+            for(Pair neighbor : adj.get(u)){
+                int v = neighbor.n;
+                int weight = neighbor.w;
+                if(dist[u]+weight<dist[v]){
+                    dist[v] = dist[u]+weight;
+                    pq.add(new Pair(v, dist[v]));
+                }
+            }
+        }
+        int ans = 0;
+        for(int i = 1; i<=n; i++){
+            if(dist[i] == Integer.MAX_VALUE)return -1;
+            ans = Math.max(ans, dist[i]);
+        }
+        return ans;
+    }
+}
+class Pair{
+    int n;
+    int w;
+    Pair(int uu, int ww){
+        n = uu;
+        w = ww;
+    }
+}
+
+
